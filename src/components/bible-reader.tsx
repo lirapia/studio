@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookMark } from 'lucide-react';
+import { Bookmark as BookmarkIcon } from 'lucide-react';
 import { bibles, BIBLE_VERSIONS } from '@/lib/bible';
 import type { Verse, Bookmark } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -112,7 +112,7 @@ export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderP
                     aria-label={`Bookmark verse ${verse.verse}`}
                     disabled={isBookmarked}
                   >
-                    <BookMark className={cn('h-5 w-5', isBookmarked ? 'text-primary fill-primary' : 'text-primary/50')} />
+                    <BookmarkIcon className={cn('h-5 w-5', isBookmarked ? 'text-primary fill-primary' : 'text-primary/50')} />
                   </Button>
                 </div>
               );
