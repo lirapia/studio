@@ -12,7 +12,6 @@ export default {
       fontFamily: {
         body: ['Literata', 'serif'],
         headline: ['"PT Sans"', 'sans-serif'],
-        code: ['monospace'],
       },
       colors: {
         background: 'hsl(var(--background))',
