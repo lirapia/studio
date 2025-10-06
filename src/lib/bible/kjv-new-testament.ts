@@ -1,4 +1,3 @@
-
 import type { Book } from '@/lib/types';
 
 export const newTestament: Book[] = [
@@ -16,14 +15,7 @@ export const newTestament: Book[] = [
   },
   {
     "book": "John",
-    "chapters": [
-      {
-        "chapter": 3,
-        "verses": [
-          { "verse": 16, "text": "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life." }
-        ]
-      }
-    ]
+    "chapters": []
   },
   {
     "book": "Acts",

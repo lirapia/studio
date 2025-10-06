@@ -13,7 +13,13 @@ export interface Book {
   chapters: Chapter[];
 }
 
-export type Bible = Book[];
+export interface BibleBook {
+  book: string;
+  chapterCount: number;
+}
+
+
+export type Bible = BibleBook[];
 
 export interface Bookmark {
   id: string;
