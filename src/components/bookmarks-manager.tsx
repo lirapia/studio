@@ -182,11 +182,9 @@ export default function BookmarksManager({
                             <DropdownMenu>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 shrink-0">
-                                                <MoreVertical className="h-4 w-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 shrink-0">
+                                            <MoreVertical className="h-4 w-4" />
+                                        </Button>
                                     </TooltipTrigger>
                                     <TooltipContent><p>Group Actions</p></TooltipContent>
                                 </Tooltip>
