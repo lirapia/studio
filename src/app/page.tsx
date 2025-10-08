@@ -18,6 +18,7 @@ export default function Home() {
     addBookmark,
     updateBookmark,
     deleteBookmark,
+    exportBookmark,
     importBookmarks,
     exportBookmarks,
     addGroup,
@@ -69,6 +70,7 @@ export default function Home() {
              groups={groups}
              updateBookmark={updateBookmark} 
              deleteBookmark={deleteBookmark}
+             exportBookmark={exportBookmark}
              addGroup={addGroup}
              updateGroup={updateGroup}
              deleteGroup={deleteGroup}

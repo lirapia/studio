@@ -179,6 +179,24 @@ export function useBookmarks() {
       });
     }
   }, [bookmarks, groups, toast, exportData]);
+
+    const exportBookmark = useCallback((bookmarkId: string) => {
+        const bookmark = bookmarks.find(b => b.id === bookmarkId);
+        if (!bookmark) {
+            toast({
+                title: "Bookmark Not Found",
+                variant: "destructive"
+            });
+            return;
+        }
+        const success = exportData(bookmark, `verse-mark-bookmark-${bookmark.title.toLowerCase().replace(/\s/g, '-')}.json`);
+        if (success) {
+            toast({
+                title: "Bookmark Exported",
+                description: `The bookmark "${bookmark.title}" has been exported.`,
+            });
+        }
+    }, [bookmarks, toast, exportData]);
   
   const exportGroup = useCallback((groupId: string) => {
       const group = groups.find(g => g.id === groupId);
@@ -259,5 +277,5 @@ export function useBookmarks() {
     reader.readAsText(file);
   }, [toast]);
 
-  return { bookmarks, groups, addBookmark, updateBookmark, deleteBookmark, exportBookmarks, importBookmarks, addGroup, updateGroup, deleteGroup, UNCATEGORIZED_GROUP_ID, heroGroupId, setHeroGroup, exportGroup };
+  return { bookmarks, groups, addBookmark, updateBookmark, deleteBookmark, exportBookmark, exportBookmarks, importBookmarks, addGroup, updateGroup, deleteGroup, UNCATEGORIZED_GROUP_ID, heroGroupId, setHeroGroup, exportGroup };
 }

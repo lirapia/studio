@@ -15,12 +15,11 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Edit, BookOpen, Plus, Settings, Download, Star, StarOff } from 'lucide-react';
+import { Trash2, Edit, BookOpen, Settings, Download, Star, StarOff, MoreVertical } from 'lucide-react';
 import { ScrollArea } from './ui/scroll-area';
 import {
   SidebarHeader,
   SidebarContent,
-  SidebarFooter,
 } from './ui/sidebar';
 import AddBookmarkDialog from './add-bookmark-dialog';
 import { ManageGroupsDialog } from './manage-groups-dialog';
@@ -35,13 +34,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from './ui/dropdown-menu';
 
 interface BookmarksManagerProps {
   bookmarks: Bookmark[];
   groups: BookmarkGroup[];
   updateBookmark: (id: string, updatedBookmark: Partial<Omit<Bookmark, 'id'>>) => void;
   deleteBookmark: (id: string) => void;
+  exportBookmark: (id: string) => void;
   addGroup: (title: string) => void;
   updateGroup: (id: string, title: string) => void;
   deleteGroup: (id: string) => void;
@@ -56,6 +57,7 @@ export default function BookmarksManager({
   groups,
   updateBookmark,
   deleteBookmark,
+  exportBookmark,
   addGroup,
   updateGroup,
   deleteGroup,
@@ -168,36 +170,41 @@ export default function BookmarksManager({
                  group && (
                    <AccordionItem key={group.id} value={group.id} className="border-none mb-2">
                       <Card className="bg-sidebar-accent/30">
-                        <AccordionTrigger className="p-4 hover:no-underline">
-                           <div className="flex justify-between w-full items-center">
-                              <div className="flex items-center gap-2">
-                                  {heroGroupId === group.id && <Star className="size-4 text-primary fill-primary" />}
-                                  <h3 className="font-headline text-lg font-bold text-sidebar-foreground">{group.title}</h3>
+                        <AccordionTrigger className="p-4 hover:no-underline" >
+                           <div className="flex justify-between w-full items-center" >
+                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                                  {heroGroupId === group.id && <Star className="size-4 text-primary fill-primary shrink-0" />}
+                                  <h3 className="font-headline text-lg font-bold text-sidebar-foreground truncate">{group.title}</h3>
+                                  <Badge variant="secondary" className="shrink-0">{groupBookmarks.length}</Badge>
                               </div>
-                              <Badge variant="secondary">{groupBookmarks.length}</Badge>
+                               
+                              {group.id !== uncategorizedGroupId && (
+                                <DropdownMenu>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 shrink-0" onClick={e => e.stopPropagation()}>
+                                                    <MoreVertical className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                        </TooltipTrigger>
+                                        <TooltipContent><p>Group Actions</p></TooltipContent>
+                                    </Tooltip>
+                                  <DropdownMenuContent onClick={e => e.stopPropagation()} align="end">
+                                    <DropdownMenuItem onSelect={() => setHeroGroup(group.id)}>
+                                      <Star className="mr-2 h-4 w-4" />
+                                      <span>Set as Hero</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onSelect={() => exportGroup(group.id)}>
+                                      <Download className="mr-2 h-4 w-4" />
+                                      <span>Export Group</span>
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              )}
                            </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 space-y-2">
-                           {groupBookmarks.length > 0 && (
-                               <div className="flex items-center justify-end gap-2 mb-2">
-                                   <Tooltip>
-                                       <TooltipTrigger asChild>
-                                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setHeroGroup(group.id)}>
-                                               <Star className="h-4 w-4" />
-                                           </Button>
-                                       </TooltipTrigger>
-                                       <TooltipContent><p>Set as Hero Verses</p></TooltipContent>
-                                   </Tooltip>
-                                   <Tooltip>
-                                       <TooltipTrigger asChild>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => exportGroup(group.id)}>
-                                                <Download className="h-4 w-4" />
-                                            </Button>
-                                       </TooltipTrigger>
-                                       <TooltipContent><p>Export Group</p></TooltipContent>
-                                   </Tooltip>
-                               </div>
-                           )}
                            <Accordion type="multiple" className="w-full">
                             {groupBookmarks.map(bookmark => (
                                 <AccordionItem key={bookmark.id} value={bookmark.id}>
@@ -218,10 +225,15 @@ export default function BookmarksManager({
                                         {bookmark.isImported && <Badge variant="outline">Imported</Badge>}
                                         <Badge variant="secondary">{new Date(bookmark.createdAt).toLocaleDateString()}</Badge>
                                         </div>
-                                        <div className="flex gap-2">
-                                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditingBookmark(bookmark)}>
-                                            <Edit className="h-4 w-4" />
-                                        </Button>
+                                        <div className="flex gap-1">
+                                        <Tooltip>
+                                            <TooltipTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => exportBookmark(bookmark.id)}><Download className="h-4 w-4" /></Button></TooltipTrigger>
+                                            <TooltipContent><p>Export Bookmark</p></TooltipContent>
+                                        </Tooltip>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditingBookmark(bookmark)}><Edit className="h-4 w-4" /></Button></TooltipTrigger>
+                                            <TooltipContent><p>Edit Bookmark</p></TooltipContent>
+                                        </Tooltip>
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
                                                 <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/20 hover:text-destructive">
