@@ -15,7 +15,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Edit, BookOpen, Plus, Settings } from 'lucide-react';
+import { Trash2, Edit, BookOpen, Plus, Settings, Download, Star, StarOff } from 'lucide-react';
 import { ScrollArea } from './ui/scroll-area';
 import {
   SidebarHeader,
@@ -35,6 +35,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 interface BookmarksManagerProps {
   bookmarks: Bookmark[];
@@ -45,6 +46,9 @@ interface BookmarksManagerProps {
   updateGroup: (id: string, title: string) => void;
   deleteGroup: (id: string) => void;
   uncategorizedGroupId: string;
+  heroGroupId: string | null;
+  setHeroGroup: (groupId: string | null) => void;
+  exportGroup: (groupId: string) => void;
 }
 
 export default function BookmarksManager({
@@ -55,7 +59,10 @@ export default function BookmarksManager({
   addGroup,
   updateGroup,
   deleteGroup,
-  uncategorizedGroupId
+  uncategorizedGroupId,
+  heroGroupId,
+  setHeroGroup,
+  exportGroup
 }: BookmarksManagerProps) {
   const [editingBookmark, setEditingBookmark] = useState<Bookmark | null>(null);
   const [isGroupsDialogOpen, setGroupsDialogOpen] = useState(false);
@@ -86,14 +93,16 @@ export default function BookmarksManager({
 
     bookmarks.forEach(bookmark => {
       const groupId = bookmark.groupId ?? uncategorizedGroupId;
-      if (!groupMap.has(groupId)) {
-          // This case handles bookmarks with a groupId that no longer exists.
-          // They are added to uncategorized.
-          const currentUncategorized = groupMap.get(uncategorizedGroupId) || [];
-          groupMap.set(uncategorizedGroupId, [...currentUncategorized, bookmark]);
-      } else {
-        const currentGroupBookmarks = groupMap.get(groupId) || [];
-        groupMap.set(groupId, [...currentGroupBookmarks, bookmark]);
+      const groupList = groupMap.get(groupId) || [];
+      if (!groupList.find(b => b.id === bookmark.id)) {
+        if (groupMap.has(groupId)) {
+            groupMap.set(groupId, [...groupList, bookmark]);
+        } else {
+            // This case handles bookmarks with a groupId that no longer exists.
+            // They are added to uncategorized.
+            const currentUncategorized = groupMap.get(uncategorizedGroupId) || [];
+            groupMap.set(uncategorizedGroupId, [...currentUncategorized, bookmark]);
+        }
       }
     });
 
@@ -120,9 +129,30 @@ export default function BookmarksManager({
                 <BookOpen className="size-6 text-primary" />
                 <h2 className="font-headline text-2xl font-bold">My Bookmarks</h2>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => setGroupsDialogOpen(true)}>
-                <Settings className="size-5" />
-            </Button>
+            <div className="flex items-center">
+                {heroGroupId && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={() => setHeroGroup(null)}>
+                                <StarOff className="size-5 text-primary" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                            <p>Show AI-powered verses</p>
+                        </TooltipContent>
+                    </Tooltip>
+                )}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" onClick={() => setGroupsDialogOpen(true)}>
+                            <Settings className="size-5" />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                        <p>Manage Groups</p>
+                    </TooltipContent>
+                </Tooltip>
+            </div>
         </div>
       </SidebarHeader>
 
@@ -135,16 +165,39 @@ export default function BookmarksManager({
           ) : (
              <Accordion type="multiple" className="w-full p-4">
                {groupedBookmarks.map(({ group, bookmarks: groupBookmarks }) => (
-                 group && groupBookmarks.length > 0 && (
+                 group && (
                    <AccordionItem key={group.id} value={group.id} className="border-none mb-2">
                       <Card className="bg-sidebar-accent/30">
                         <AccordionTrigger className="p-4 hover:no-underline">
                            <div className="flex justify-between w-full items-center">
-                              <h3 className="font-headline text-lg font-bold text-sidebar-foreground">{group.title}</h3>
+                              <div className="flex items-center gap-2">
+                                  {heroGroupId === group.id && <Star className="size-4 text-primary fill-primary" />}
+                                  <h3 className="font-headline text-lg font-bold text-sidebar-foreground">{group.title}</h3>
+                              </div>
                               <Badge variant="secondary">{groupBookmarks.length}</Badge>
                            </div>
                         </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4">
+                        <AccordionContent className="px-4 pb-4 space-y-2">
+                           {groupBookmarks.length > 0 && (
+                               <div className="flex items-center justify-end gap-2 mb-2">
+                                   <Tooltip>
+                                       <TooltipTrigger asChild>
+                                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setHeroGroup(group.id)}>
+                                               <Star className="h-4 w-4" />
+                                           </Button>
+                                       </TooltipTrigger>
+                                       <TooltipContent><p>Set as Hero Verses</p></TooltipContent>
+                                   </Tooltip>
+                                   <Tooltip>
+                                       <TooltipTrigger asChild>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => exportGroup(group.id)}>
+                                                <Download className="h-4 w-4" />
+                                            </Button>
+                                       </TooltipTrigger>
+                                       <TooltipContent><p>Export Group</p></TooltipContent>
+                                   </Tooltip>
+                               </div>
+                           )}
                            <Accordion type="multiple" className="w-full">
                             {groupBookmarks.map(bookmark => (
                                 <AccordionItem key={bookmark.id} value={bookmark.id}>
@@ -195,6 +248,9 @@ export default function BookmarksManager({
                                 </AccordionItem>
                             ))}
                             </Accordion>
+                             {groupBookmarks.length === 0 && (
+                                <p className="text-center text-xs text-sidebar-foreground/50 py-4">No bookmarks in this group yet.</p>
+                             )}
                         </AccordionContent>
                       </Card>
                    </AccordionItem>

@@ -6,11 +6,13 @@ import { useToast } from '@/hooks/use-toast';
 
 const BOOKMARKS_STORAGE_KEY = 'verseMarkBookmarks';
 const GROUPS_STORAGE_KEY = 'verseMarkGroups';
+const HERO_GROUP_ID_STORAGE_KEY = 'verseMarkHeroGroupId';
 const UNCATEGORIZED_GROUP_ID = 'uncategorized';
 
 export function useBookmarks() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [groups, setGroups] = useState<BookmarkGroup[]>([]);
+  const [heroGroupId, setHeroGroupIdState] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const { toast } = useToast();
 
@@ -28,6 +30,11 @@ export function useBookmarks() {
         const defaultGroup: BookmarkGroup = { id: UNCATEGORIZED_GROUP_ID, title: 'Uncategorized', createdAt: new Date().toISOString() };
         setGroups([defaultGroup]);
       }
+      const storedHeroGroupId = localStorage.getItem(HERO_GROUP_ID_STORAGE_KEY);
+      if (storedHeroGroupId) {
+        setHeroGroupIdState(JSON.parse(storedHeroGroupId));
+      }
+
     } catch (error) {
       console.error('Failed to load data from localStorage', error);
       toast({
@@ -44,6 +51,7 @@ export function useBookmarks() {
       try {
         localStorage.setItem(BOOKMARKS_STORAGE_KEY, JSON.stringify(bookmarks));
         localStorage.setItem(GROUPS_STORAGE_KEY, JSON.stringify(groups));
+        localStorage.setItem(HERO_GROUP_ID_STORAGE_KEY, JSON.stringify(heroGroupId));
       } catch (error) {
         console.error('Failed to save data to localStorage', error);
          toast({
@@ -53,13 +61,14 @@ export function useBookmarks() {
         });
       }
     }
-  }, [bookmarks, groups, isInitialized, toast]);
+  }, [bookmarks, groups, heroGroupId, isInitialized, toast]);
 
-  const addBookmark = useCallback((newBookmark: Omit<Bookmark, 'id' | 'createdAt'>) => {
+  const addBookmark = useCallback((newBookmark: Omit<Bookmark, 'id' | 'createdAt' | 'isImported'>) => {
     const bookmark: Bookmark = {
       ...newBookmark,
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
+      isImported: false,
     };
     setBookmarks(prev => [bookmark, ...prev]);
     toast({
@@ -105,11 +114,53 @@ export function useBookmarks() {
   }, [toast]);
 
   const deleteGroup = useCallback((id: string) => {
+    if(heroGroupId === id) {
+        setHeroGroupIdState(null);
+    }
     setBookmarks(prev => prev.map(b => b.groupId === id ? { ...b, groupId: UNCATEGORIZED_GROUP_ID } : b));
     setGroups(prev => prev.filter(g => g.id !== id));
     toast({ title: 'Group Deleted', description: 'Group has been deleted and its bookmarks moved to Uncategorized.', variant: 'destructive' });
-  }, [toast]);
+  }, [heroGroupId, toast]);
 
+  const setHeroGroup = useCallback((groupId: string | null) => {
+      setHeroGroupIdState(groupId);
+      if (groupId) {
+        const group = groups.find(g => g.id === groupId);
+        toast({
+            title: "Hero Section Updated",
+            description: `Now showing verses from "${group?.title}".`,
+        });
+      } else {
+         toast({
+            title: "Hero Section Updated",
+            description: `Now showing AI-powered verses.`,
+        });
+      }
+  },[groups, toast]);
+
+  const exportData = useCallback((dataToExport: object, fileName: string) => {
+    try {
+      const dataStr = JSON.stringify(dataToExport, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      return true;
+    } catch (error) {
+      console.error('Failed to export data', error);
+      toast({
+        title: "Export Failed",
+        description: "There was an error exporting your data.",
+        variant: "destructive",
+      });
+      return false;
+    }
+  }, [toast]);
 
   const exportBookmarks = useCallback(() => {
     if (bookmarks.length === 0) {
@@ -120,30 +171,39 @@ export function useBookmarks() {
       });
       return;
     }
-    try {
-      const data = JSON.stringify({ bookmarks, groups }, null, 2);
-      const blob = new Blob([data], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `verse-mark-data-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+    const success = exportData({ bookmarks, groups }, `verse-mark-data-${new Date().toISOString().split('T')[0]}.json`);
+    if(success) {
       toast({
         title: "Export Successful",
         description: "Your bookmarks and groups have been exported.",
       });
-    } catch (error) {
-      console.error('Failed to export data', error);
-      toast({
-        title: "Export Failed",
-        description: "There was an error exporting your data.",
-        variant: "destructive",
-      });
     }
-  }, [bookmarks, groups, toast]);
+  }, [bookmarks, groups, toast, exportData]);
+  
+  const exportGroup = useCallback((groupId: string) => {
+      const group = groups.find(g => g.id === groupId);
+      if(!group) return;
+
+      const groupBookmarks = bookmarks.filter(b => b.groupId === groupId);
+
+      if (groupBookmarks.length === 0) {
+          toast({
+              title: "No Bookmarks in Group",
+              description: `The group "${group.title}" has no bookmarks to export.`,
+              variant: "destructive"
+          });
+          return;
+      }
+
+      const success = exportData({ bookmarks: groupBookmarks, groups: [group] }, `verse-mark-group-${group.title.toLowerCase().replace(/\s/g, '-')}.json`);
+      if(success) {
+          toast({
+              title: "Group Exported",
+              description: `The group "${group.title}" has been exported.`,
+          });
+      }
+  }, [bookmarks, groups, toast, exportData]);
+
 
   const importBookmarks = useCallback((file: File) => {
     const reader = new FileReader();
@@ -199,5 +259,5 @@ export function useBookmarks() {
     reader.readAsText(file);
   }, [toast]);
 
-  return { bookmarks, groups, addBookmark, updateBookmark, deleteBookmark, exportBookmarks, importBookmarks, addGroup, updateGroup, deleteGroup, UNCATEGORIZED_GROUP_ID };
+  return { bookmarks, groups, addBookmark, updateBookmark, deleteBookmark, exportBookmarks, importBookmarks, addGroup, updateGroup, deleteGroup, UNCATEGORIZED_GROUP_ID, heroGroupId, setHeroGroup, exportGroup };
 }

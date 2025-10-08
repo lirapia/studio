@@ -3,20 +3,30 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { getHeroVerse, type HeroVerseOutput } from '@/ai/flows/rotating-hero-verses';
+import type { HeroVerseOutput } from '@/ai/flows/rotating-hero-verses';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from './ui/button';
+import { RefreshCcw } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
-export default function HeroVerse() {
+interface HeroVerseProps {
+  customVerses: HeroVerseOutput[] | null;
+  defaultVerseFetcher: () => Promise<HeroVerseOutput>;
+  onShowDefault: () => void;
+}
+
+export default function HeroVerse({ customVerses, defaultVerseFetcher, onShowDefault }: HeroVerseProps) {
   const [verse, setVerse] = useState<HeroVerseOutput | null>(null);
   const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-background');
 
   const fetchVerse = useCallback(async () => {
     try {
       setLoading(true);
-      const newVerse = await getHeroVerse({ bibleVersion: 'KJV' });
+      const newVerse = await defaultVerseFetcher();
       setVerse(newVerse);
     } catch (error) {
       console.error('Error fetching hero verse:', error);
@@ -30,13 +40,29 @@ export default function HeroVerse() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [defaultVerseFetcher]);
 
   useEffect(() => {
-    fetchVerse();
-    const interval = setInterval(fetchVerse, 60 * 60 * 1000); // every hour
+    let interval: NodeJS.Timeout | undefined;
+
+    if (customVerses && customVerses.length > 0) {
+      setLoading(false);
+      setVerse(customVerses[currentIndex]);
+      interval = setInterval(() => {
+        setCurrentIndex(prevIndex => (prevIndex + 1) % customVerses.length);
+      }, 60 * 60 * 1000); // every hour
+    } else {
+      fetchVerse();
+      interval = setInterval(fetchVerse, 60 * 60 * 1000); // every hour
+    }
+
     return () => clearInterval(interval);
-  }, [fetchVerse]);
+  }, [customVerses, fetchVerse, currentIndex]);
+
+  useEffect(() => {
+    // Reset index when custom verses change
+    setCurrentIndex(0);
+  }, [customVerses]);
 
   return (
     <Card className="relative mb-8 w-full overflow-hidden border-primary/20 shadow-lg shadow-primary/10">
@@ -51,6 +77,25 @@ export default function HeroVerse() {
         />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
+      
+      {customVerses && customVerses.length > 0 && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2 right-2 z-20 text-white hover:bg-white/20 hover:text-white"
+                    onClick={onShowDefault}
+                >
+                    <RefreshCcw className="h-5 w-5" />
+                </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+                <p>Show AI-powered verses</p>
+            </TooltipContent>
+          </Tooltip>
+      )}
+
       <CardContent className="relative z-10 flex min-h-[200px] flex-col items-center justify-center p-6 text-center text-foreground">
         {loading ? (
           <div className="w-full max-w-2xl space-y-4">
@@ -68,7 +113,12 @@ export default function HeroVerse() {
               {verse.book} {verse.chapter}:{verse.verse}
             </cite>
           </>
-        ) : null}
+        ) : (
+            <div className="text-center">
+                <p className="font-headline text-xl font-semibold">No verses in this group</p>
+                <p className="text-sm text-muted-foreground">Add bookmarks to this group to see them here.</p>
+            </div>
+        )}
       </CardContent>
     </Card>
   );

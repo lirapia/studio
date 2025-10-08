@@ -9,6 +9,7 @@ import BookmarksManager from '@/components/bookmarks-manager';
 import {useBookmarks} from '@/hooks/use-bookmarks';
 import AddBookmarkDialog from '@/components/add-bookmark-dialog';
 import type {Verse, Bookmark, BookmarkGroup} from '@/lib/types';
+import { getHeroVerse } from '@/ai/flows/rotating-hero-verses';
 
 export default function Home() {
   const {
@@ -23,6 +24,9 @@ export default function Home() {
     updateGroup,
     deleteGroup,
     UNCATEGORIZED_GROUP_ID,
+    heroGroupId,
+    setHeroGroup,
+    exportGroup,
   } = useBookmarks();
   const [verseToBookmark, setVerseToBookmark] = React.useState<{version: string; book: string; chapter: number; verse: Verse} | null>(null);
 
@@ -46,6 +50,15 @@ export default function Home() {
       setVerseToBookmark(null);
     }
   };
+  
+  const heroVerses = React.useMemo(() => {
+    if (heroGroupId) {
+        return bookmarks
+            .filter(b => b.groupId === heroGroupId)
+            .map(b => ({ book: b.book, chapter: b.chapter, verse: b.verse, text: b.text }));
+    }
+    return null;
+  }, [heroGroupId, bookmarks]);
 
   return (
     <SidebarProvider>
@@ -60,12 +73,19 @@ export default function Home() {
              updateGroup={updateGroup}
              deleteGroup={deleteGroup}
              uncategorizedGroupId={UNCATEGORIZED_GROUP_ID}
+             heroGroupId={heroGroupId}
+             setHeroGroup={setHeroGroup}
+             exportGroup={exportGroup}
             />
         </Sidebar>
         <SidebarInset className="bg-background flex flex-col">
           <Header importBookmarks={importBookmarks} exportBookmarks={exportBookmarks} />
           <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-            <HeroVerse />
+            <HeroVerse 
+                customVerses={heroVerses} 
+                defaultVerseFetcher={() => getHeroVerse({ bibleVersion: 'KJV' })}
+                onShowDefault={() => setHeroGroup(null)}
+            />
             <BibleReader onBookmarkVerse={handleBookmarkVerse} bookmarks={bookmarks} />
           </main>
         </SidebarInset>
