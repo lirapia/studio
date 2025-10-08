@@ -206,8 +206,10 @@ const Sidebar = React.forwardRef<
             }
             side={side}
           >
-            <SheetTitle className="sr-only">Bookmarks and Navigation</SheetTitle>
-            <SheetDescription className="sr-only">Manage your bookmarks and navigate the app.</SheetDescription>
+            <SheetTitle className="sr-only">VerseMark Navigation</SheetTitle>
+            <SheetDescription className="sr-only">
+              Manage your bookmarks and navigate the application.
+            </SheetDescription>
             <div className="flex h-full w-full flex-col">{children}</div>
           </SheetContent>
         </Sheet>
