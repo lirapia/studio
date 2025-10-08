@@ -13,14 +13,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import type { Verse, Bookmark } from '@/lib/types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import type { Verse, Bookmark, BookmarkGroup } from '@/lib/types';
 
 interface AddBookmarkDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (title: string, note: string) => void;
+  onSave: (title: string, note: string, groupId: string | null) => void;
   verseData?: { version: string; book: string; chapter: number; verse: Verse } | null;
   existingBookmark?: Bookmark | null;
+  groups: BookmarkGroup[];
+  uncategorizedGroupId: string;
 }
 
 export default function AddBookmarkDialog({
@@ -29,9 +32,12 @@ export default function AddBookmarkDialog({
   onSave,
   verseData,
   existingBookmark,
+  groups,
+  uncategorizedGroupId
 }: AddBookmarkDialogProps) {
   const [title, setTitle] = useState('');
   const [note, setNote] = useState('');
+  const [groupId, setGroupId] = useState<string | null>(uncategorizedGroupId);
 
   const data = existingBookmark ? {
       book: existingBookmark.book,
@@ -46,17 +52,19 @@ export default function AddBookmarkDialog({
         if(isEditing && existingBookmark) {
             setTitle(existingBookmark.title);
             setNote(existingBookmark.note);
+            setGroupId(existingBookmark.groupId ?? uncategorizedGroupId);
         } else if (verseData) {
             setTitle(`${verseData.book} ${verseData.chapter}:${verseData.verse.verse}`);
             setNote('');
+            setGroupId(uncategorizedGroupId);
         }
     }
-  }, [isOpen, verseData, isEditing, existingBookmark]);
+  }, [isOpen, verseData, isEditing, existingBookmark, uncategorizedGroupId]);
   
 
   const handleSave = () => {
     if (title.trim()) {
-      onSave(title, note);
+      onSave(title, note, groupId);
       onClose();
     }
   };
@@ -89,6 +97,21 @@ export default function AddBookmarkDialog({
                 placeholder="Enter a title for your bookmark"
               />
             </div>
+             <div className="space-y-2">
+              <Label htmlFor="group">Group</Label>
+              <Select value={groupId ?? uncategorizedGroupId} onValueChange={(value) => setGroupId(value)}>
+                <SelectTrigger id="group">
+                  <SelectValue placeholder="Select a group" />
+                </SelectTrigger>
+                <SelectContent>
+                  {groups.map(group => (
+                    <SelectItem key={group.id} value={group.id}>
+                      {group.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="note">Notes</Label>
               <Textarea
@@ -105,7 +128,7 @@ export default function AddBookmarkDialog({
             Cancel
           </Button>
           <Button onClick={handleSave} disabled={!title.trim()}>
-            Save Bookmark
+            {isEditing ? 'Save Changes' : 'Save Bookmark'}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -32,4 +32,11 @@ export interface Bookmark {
   note: string;
   createdAt: string;
   isImported?: boolean;
+  groupId: string | null;
+}
+
+export interface BookmarkGroup {
+  id: string;
+  title: string;
+  createdAt: string;
 }

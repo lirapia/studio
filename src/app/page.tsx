@@ -8,17 +8,29 @@ import BibleReader from '@/components/bible-reader';
 import BookmarksManager from '@/components/bookmarks-manager';
 import {useBookmarks} from '@/hooks/use-bookmarks';
 import AddBookmarkDialog from '@/components/add-bookmark-dialog';
-import type {Verse, Bookmark} from '@/lib/types';
+import type {Verse, Bookmark, BookmarkGroup} from '@/lib/types';
 
 export default function Home() {
-  const {bookmarks, addBookmark, updateBookmark, deleteBookmark, importBookmarks, exportBookmarks} = useBookmarks();
+  const {
+    bookmarks,
+    groups,
+    addBookmark,
+    updateBookmark,
+    deleteBookmark,
+    importBookmarks,
+    exportBookmarks,
+    addGroup,
+    updateGroup,
+    deleteGroup,
+    UNCATEGORIZED_GROUP_ID,
+  } = useBookmarks();
   const [verseToBookmark, setVerseToBookmark] = React.useState<{version: string; book: string; chapter: number; verse: Verse} | null>(null);
 
   const handleBookmarkVerse = (version: string, book: string, chapter: number, verse: Verse) => {
     setVerseToBookmark({version, book, chapter, verse});
   };
 
-  const handleSaveBookmark = (title: string, note: string) => {
+  const handleSaveBookmark = (title: string, note: string, groupId: string | null) => {
     if (verseToBookmark) {
       const newBookmark: Omit<Bookmark, 'id' | 'createdAt' | 'isImported'> = {
         title,
@@ -28,6 +40,7 @@ export default function Home() {
         verse: verseToBookmark.verse.verse,
         text: verseToBookmark.verse.text,
         note,
+        groupId,
       };
       addBookmark(newBookmark);
       setVerseToBookmark(null);
@@ -38,7 +51,16 @@ export default function Home() {
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
         <Sidebar variant="inset" side="right" className="dark:bg-background bg-sidebar" collapsible="icon">
-           <BookmarksManager bookmarks={bookmarks} updateBookmark={updateBookmark} deleteBookmark={deleteBookmark} />
+           <BookmarksManager 
+             bookmarks={bookmarks}
+             groups={groups}
+             updateBookmark={updateBookmark} 
+             deleteBookmark={deleteBookmark}
+             addGroup={addGroup}
+             updateGroup={updateGroup}
+             deleteGroup={deleteGroup}
+             uncategorizedGroupId={UNCATEGORIZED_GROUP_ID}
+            />
         </Sidebar>
         <SidebarInset className="bg-background flex flex-col">
           <Header importBookmarks={importBookmarks} exportBookmarks={exportBookmarks} />
@@ -53,6 +75,8 @@ export default function Home() {
         onClose={() => setVerseToBookmark(null)}
         verseData={verseToBookmark}
         onSave={handleSaveBookmark}
+        groups={groups}
+        uncategorizedGroupId={UNCATEGORIZED_GROUP_ID}
       />
     </SidebarProvider>
   );
