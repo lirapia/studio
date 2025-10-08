@@ -95,16 +95,16 @@ export default function BookmarksManager({
 
     bookmarks.forEach(bookmark => {
       const groupId = bookmark.groupId ?? uncategorizedGroupId;
-      const groupList = groupMap.get(groupId) || [];
-      if (!groupList.find(b => b.id === bookmark.id)) {
-        if (groupMap.has(groupId)) {
+      if (groupMap.has(groupId)) {
+        const groupList = groupMap.get(groupId) || [];
+        if (!groupList.find(b => b.id === bookmark.id)) {
             groupMap.set(groupId, [...groupList, bookmark]);
-        } else {
-            // This case handles bookmarks with a groupId that no longer exists.
-            // They are added to uncategorized.
-            const currentUncategorized = groupMap.get(uncategorizedGroupId) || [];
-            groupMap.set(uncategorizedGroupId, [...currentUncategorized, bookmark]);
         }
+      } else {
+          // This case handles bookmarks with a groupId that no longer exists.
+          // They are added to uncategorized.
+          const currentUncategorized = groupMap.get(uncategorizedGroupId) || [];
+          groupMap.set(uncategorizedGroupId, [...currentUncategorized, bookmark]);
       }
     });
 
@@ -170,41 +170,40 @@ export default function BookmarksManager({
                  group && (
                    <AccordionItem key={group.id} value={group.id} className="border-none mb-2">
                       <Card className="bg-sidebar-accent/30">
-                        <AccordionTrigger className="p-4 hover:no-underline" >
-                           <div className="flex justify-between w-full items-center" >
-                              <div className="flex items-center gap-2 flex-1 min-w-0">
-                                  {heroGroupId === group.id && <Star className="size-4 text-primary fill-primary shrink-0" />}
-                                  <h3 className="font-headline text-lg font-bold text-sidebar-foreground truncate">{group.title}</h3>
-                                  <Badge variant="secondary" className="shrink-0">{groupBookmarks.length}</Badge>
-                              </div>
-                               
-                              {group.id !== uncategorizedGroupId && (
-                                <DropdownMenu>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 shrink-0" onClick={e => e.stopPropagation()}>
-                                                    <MoreVertical className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                        </TooltipTrigger>
-                                        <TooltipContent><p>Group Actions</p></TooltipContent>
-                                    </Tooltip>
-                                  <DropdownMenuContent onClick={e => e.stopPropagation()} align="end">
-                                    <DropdownMenuItem onSelect={() => setHeroGroup(group.id)}>
-                                      <Star className="mr-2 h-4 w-4" />
-                                      <span>Set as Hero</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onSelect={() => exportGroup(group.id)}>
-                                      <Download className="mr-2 h-4 w-4" />
-                                      <span>Export Group</span>
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              )}
-                           </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4 space-y-2">
+                        <div className="flex justify-between w-full items-center p-4">
+                            <AccordionTrigger className="p-0 hover:no-underline flex-1" >
+                                <div className="flex items-center gap-2 flex-1 min-w-0">
+                                    {heroGroupId === group.id && <Star className="size-4 text-primary fill-primary shrink-0" />}
+                                    <h3 className="font-headline text-lg font-bold text-sidebar-foreground truncate text-left">{group.title}</h3>
+                                    <Badge variant="secondary" className="shrink-0">{groupBookmarks.length}</Badge>
+                                </div>
+                            </AccordionTrigger>
+                            {group.id !== uncategorizedGroupId && (
+                            <DropdownMenu>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 shrink-0">
+                                                <MoreVertical className="h-4 w-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                    </TooltipTrigger>
+                                    <TooltipContent><p>Group Actions</p></TooltipContent>
+                                </Tooltip>
+                                <DropdownMenuContent align="end">
+                                <DropdownMenuItem onSelect={() => setHeroGroup(group.id)}>
+                                    <Star className="mr-2 h-4 w-4" />
+                                    <span>Set as Hero</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => exportGroup(group.id)}>
+                                    <Download className="mr-2 h-4 w-4" />
+                                    <span>Export Group</span>
+                                </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                            )}
+                        </div>
+                        <AccordionContent className="px-4 pb-4 pt-0 space-y-2">
                            <Accordion type="multiple" className="w-full">
                             {groupBookmarks.map(bookmark => (
                                 <AccordionItem key={bookmark.id} value={bookmark.id}>
