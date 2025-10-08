@@ -171,24 +171,21 @@ export default function BookmarksManager({
                    <AccordionItem key={group.id} value={group.id} className="border-none mb-2">
                       <Card className="bg-sidebar-accent/30">
                         <div className="flex justify-between w-full items-center p-4">
-                            <AccordionTrigger className="p-0 hover:no-underline flex-1" >
-                                <div className="flex items-center gap-2 flex-1 min-w-0">
-                                    {heroGroupId === group.id && <Star className="size-4 text-primary fill-primary shrink-0" />}
-                                    <h3 className="font-headline text-lg font-bold text-sidebar-foreground truncate text-left">{group.title}</h3>
-                                    <Badge variant="secondary" className="shrink-0">{groupBookmarks.length}</Badge>
-                                </div>
-                            </AccordionTrigger>
-                            {group.id !== uncategorizedGroupId && (
+                          <AccordionTrigger className="p-0 hover:no-underline flex-1" >
+                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                                  {heroGroupId === group.id && <Star className="size-4 text-primary fill-primary shrink-0" />}
+                                  <h3 className="font-headline text-lg font-bold text-sidebar-foreground truncate text-left">{group.title}</h3>
+                                  <Badge variant="secondary" className="shrink-0">{groupBookmarks.length}</Badge>
+                              </div>
+                          </AccordionTrigger>
+                          {group.id !== uncategorizedGroupId && (
                             <DropdownMenu>
-                               <Tooltip>
-                                 <TooltipTrigger asChild>
-                                    <Button asChild variant="ghost" size="icon" className="h-8 w-8 ml-2 shrink-0">
-                                      <MoreVertical className="h-4 w-4" />
-                                    </Button>
-                                 </TooltipTrigger>
-                                 <TooltipContent><p>Group Actions</p></TooltipContent>
-                               </Tooltip>
-                                <DropdownMenuContent align="end">
+                              <DropdownMenuTrigger asChild>
+                                <Button asChild variant="ghost" size="icon" className="h-8 w-8 ml-2 shrink-0">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
                                 <DropdownMenuItem onSelect={() => setHeroGroup(group.id)}>
                                     <Star className="mr-2 h-4 w-4" />
                                     <span>Set as Hero</span>
@@ -197,9 +194,9 @@ export default function BookmarksManager({
                                     <Download className="mr-2 h-4 w-4" />
                                     <span>Export Group</span>
                                 </DropdownMenuItem>
-                                </DropdownMenuContent>
+                              </DropdownMenuContent>
                             </DropdownMenu>
-                            )}
+                          )}
                         </div>
                         <AccordionContent className="px-4 pb-4 pt-0 space-y-2">
                            <Accordion type="multiple" className="w-full">
@@ -290,3 +287,5 @@ export default function BookmarksManager({
     </div>
   );
 }
+
+    
