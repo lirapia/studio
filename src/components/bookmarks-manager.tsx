@@ -180,14 +180,14 @@ export default function BookmarksManager({
                             </AccordionTrigger>
                             {group.id !== uncategorizedGroupId && (
                             <DropdownMenu>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 shrink-0">
-                                            <MoreVertical className="h-4 w-4" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent><p>Group Actions</p></TooltipContent>
-                                </Tooltip>
+                               <Tooltip>
+                                 <TooltipTrigger asChild>
+                                    <Button asChild variant="ghost" size="icon" className="h-8 w-8 ml-2 shrink-0" onClick={(e) => e.stopPropagation()}>
+                                      <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                 </TooltipTrigger>
+                                 <TooltipContent><p>Group Actions</p></TooltipContent>
+                               </Tooltip>
                                 <DropdownMenuContent align="end">
                                 <DropdownMenuItem onSelect={() => setHeroGroup(group.id)}>
                                     <Star className="mr-2 h-4 w-4" />
