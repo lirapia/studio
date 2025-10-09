@@ -125,7 +125,7 @@ const searchVideosFlow = ai.defineFlow(
       {
         id: 'o-YBDTqX_ZU',
         title: 'Sermon: He Cares for You - Trusting God in Hard Times',
-        channel: 'Johnchanglive',
+        channel: 'Johnnychanglive',
         views: '4.2M views',
         uploadedAt: '1 year ago',
         thumbnailUrl: 'https://picsum.photos/seed/vid8/640/360',
@@ -134,9 +134,12 @@ const searchVideosFlow = ai.defineFlow(
     ];
 
     // Filter placeholder videos based on query for demonstration purposes
+    const searchTerm = input.query.toLowerCase();
+    if (!searchTerm) return placeholderVideos.slice(0, 8);
+    
     return placeholderVideos.filter(v => 
-        v.title.toLowerCase().includes(input.query.toLowerCase()) || 
-        v.channel.toLowerCase().includes(input.query.toLowerCase())
+        v.title.toLowerCase().includes(searchTerm) || 
+        v.channel.toLowerCase().includes(searchTerm)
     ).slice(0, 8);
   }
 );
