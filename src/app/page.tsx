@@ -64,7 +64,7 @@ export default function Home() {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
-        <Sidebar variant="inset" side="right" className="dark:bg-background bg-sidebar" collapsible="icon">
+        <Sidebar variant="inset" side="right" collapsible="icon">
            <BookmarksManager 
              bookmarks={bookmarks}
              groups={groups}
