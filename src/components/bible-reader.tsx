@@ -21,7 +21,7 @@ interface BibleReaderProps {
   bookmarks: Bookmark[];
 }
 
-const API_URL = 'https://getbible.net/v2';
+const API_URL = 'https://bible-api.com';
 
 export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderProps) {
   const [selectedVersion, setSelectedVersion] = useState(Object.keys(BIBLE_VERSIONS)[0]);
@@ -43,27 +43,12 @@ export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderP
     const fetchChapter = async () => {
       setLoading(true);
       try {
-        const bibleId = selectedVersion === 'KJV' ? 'kjv' : 'nkjv';
-        const bookData = currentBible.find(b => b.book === selectedBook);
-        if (!bookData) throw new Error("Book not found");
-        
-        // Find book number
-        const bookNo = currentBible.indexOf(bookData) + 1;
-
-        const response = await fetch(`${API_URL}/${bibleId}/${bookNo}/${selectedChapter}.json`);
+        const response = await fetch(`${API_URL}/${selectedBook} ${selectedChapter}?translation=${selectedVersion.toLowerCase()}`);
         if (!response.ok) {
           throw new Error('Failed to fetch chapter');
         }
-        const rawData = await response.json();
-
-        // The new API returns verses with HTML, so we need to process them.
-        const fetchedVerses = rawData.verses.map((v: any) => ({
-            verse: v.verse,
-            // We'll use dangerouslySetInnerHTML, so we store the HTML text
-            text: v.text
-        }));
-
-        setVerses(fetchedVerses);
+        const data = await response.json();
+        setVerses(data.verses);
       } catch (error) {
         console.error("Error fetching chapter:", error);
         setVerses([]);
@@ -73,7 +58,7 @@ export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderP
     };
 
     fetchChapter();
-  }, [selectedBook, selectedChapter, selectedVersion, currentBible]);
+  }, [selectedBook, selectedChapter, selectedVersion]);
 
 
   const bookmarkedVerseKeys = useMemo(() => 
@@ -93,10 +78,25 @@ export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderP
     setSelectedChapter('1');
   };
 
-  const stripHtml = (html: string) => {
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    return doc.body.textContent || "";
-  }
+  const renderVerseText = (text: string, book: string) => {
+    const redLetterBooks = ['Matthew', 'Mark', 'Luke', 'John', 'Acts', 'Revelation'];
+    if (redLetterBooks.includes(book) && text.includes('“') && text.includes('”')) {
+        const parts = text.split(/(“|”)/g);
+        let inQuote = false;
+        return parts.map((part, index) => {
+            if (part === '“') {
+                inQuote = true;
+                return <span key={index} className="woj">“</span>;
+            }
+            if (part === '”') {
+                inQuote = false;
+                 return <span key={index} className="woj">”</span>;
+            }
+            return inQuote ? <span key={index} className="woj">{part}</span> : part;
+        });
+    }
+    return text;
+  };
 
   return (
     <Card className="w-full">
@@ -143,11 +143,6 @@ export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderP
               {verses.map(verse => {
                 const verseKey = `${selectedVersion}-${selectedBook}-${selectedChapter}-${verse.verse}`;
                 const isBookmarked = bookmarkedVerseKeys.has(verseKey);
-                
-                const verseForBookmark = { 
-                    ...verse, 
-                    text: stripHtml(verse.text) 
-                };
 
                 return (
                   <div key={verse.verse} className="group flex items-start gap-4">
@@ -157,13 +152,14 @@ export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderP
                         'flex-1 rounded-md p-2 transition-colors', 
                         isBookmarked ? 'bg-accent/30' : 'group-hover:bg-muted'
                       )}
-                      dangerouslySetInnerHTML={{ __html: verse.text }}
-                    />
+                    >
+                        {renderVerseText(verse.text, selectedBook)}
+                    </p>
                     <Button
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"
-                      onClick={() => onBookmarkVerse(selectedVersion, selectedBook, parseInt(selectedChapter, 10), verseForBookmark)}
+                      onClick={() => onBookmarkVerse(selectedVersion, selectedBook, parseInt(selectedChapter, 10), verse)}
                       aria-label={`Bookmark verse ${verse.verse}`}
                       disabled={isBookmarked}
                     >
