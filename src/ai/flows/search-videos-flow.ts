@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview This file defines a Genkit flow for searching YouTube videos.
+ * @fileOverview This file defines a Genkit flow for searching videos.
  * It currently returns placeholder data.
  */
 
@@ -10,7 +10,7 @@ import { z } from 'zod';
 import type { Video } from '@/lib/types';
 
 const SearchVideosInputSchema = z.object({
-  query: z.string().describe('The search query for YouTube videos.'),
+  query: z.string().describe('The search query for videos.'),
 });
 export type SearchVideosInput = z.infer<typeof SearchVideosInputSchema>;
 
@@ -30,7 +30,7 @@ export type SearchVideosOutput = z.infer<typeof SearchVideosOutputSchema>;
 
 
 // This function is what your client-side code will call.
-export async function searchYoutubeVideos(input: SearchVideosInput): Promise<SearchVideosOutput> {
+export async function searchVideos(input: SearchVideosInput): Promise<SearchVideosOutput> {
   // We are directly calling the flow here.
   return searchVideosFlow(input);
 }
@@ -43,9 +43,8 @@ const searchVideosFlow = ai.defineFlow(
     outputSchema: SearchVideosOutputSchema,
   },
   async (input) => {
-    console.log(`Searching for videos with query: ${input.query}`);
-
-    // Returning hardcoded placeholder data.
+    // This flow uses hardcoded placeholder data.
+    // In a real application, you would replace this with a call to a video API.
     const placeholderVideos: Video[] = [
       {
         id: 'placeholder1',
@@ -123,7 +122,7 @@ const searchVideosFlow = ai.defineFlow(
         channel: 'Johnnychanglive',
         views: '4.2M views',
         uploadedAt: '1 year ago',
-        thumbnailUrl: 'https://picsum.photos/seed/vid8/640/360',
+        thumbnailUrl: 'https://i.ytimg.com/vi/o-YBDTqX_ZU/hqdefault.jpg',
         channelImageUrl: 'https://picsum.photos/seed/chan8/48/48',
         platform: 'youtube',
       },

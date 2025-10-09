@@ -7,7 +7,7 @@ import BookmarksManager from '@/components/bookmarks-manager';
 import { useBookmarks } from '@/hooks/use-bookmarks';
 import type { Video } from '@/lib/types';
 import VideoCard from '@/components/video-card';
-import { searchYoutubeVideos } from '@/ai/flows/search-videos-flow';
+import { searchVideos } from '@/ai/flows/search-videos-flow';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Loader2, Search } from 'lucide-react';
@@ -35,7 +35,7 @@ export default function VideosPage() {
 
   const handleSearch = async (searchQuery: string) => {
     startTransition(async () => {
-      const results = await searchYoutubeVideos({ query: searchQuery });
+      const results = await searchVideos({ query: searchQuery });
       setVideos(results);
     });
   };
