@@ -40,3 +40,13 @@ export interface BookmarkGroup {
   title: string;
   createdAt: string;
 }
+
+export type Video = {
+  id: string;
+  title: string;
+  channel: string;
+  views: string;
+  uploadedAt: string;
+  thumbnailUrl: string;
+  channelImageUrl: string;
+};
