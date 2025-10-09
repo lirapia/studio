@@ -30,7 +30,7 @@ export default function VideosPage() {
     exportGroup,
   } = useBookmarks();
   const [videos, setVideos] = useState<Video[]>([]);
-  const [query, setQuery] = useState('Johnchanglive');
+  const [query, setQuery] = useState('Faith');
   const [isPending, startTransition] = useTransition();
 
   const handleSearch = async (searchQuery: string) => {
@@ -42,6 +42,7 @@ export default function VideosPage() {
   
   useEffect(() => {
     handleSearch(query);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
@@ -82,7 +83,7 @@ export default function VideosPage() {
                     type="text" 
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search for videos (e.g. Johnchanglive)"
+                    placeholder="Search for videos (e.g. Faith, God's Love)"
                 />
                 <Button type="submit" disabled={isPending}>
                     {isPending ? <Loader2 className="animate-spin" /> : <Search />}

@@ -7,7 +7,7 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 import type { Video } from '@/lib/types';
 
 const SearchVideosInputSchema = z.object({
@@ -60,7 +60,7 @@ const searchVideosFlow = ai.defineFlow(
     // This mimics the structure of what the YouTube API would return.
     const placeholderVideos: Video[] = [
       {
-        id: 'dQw4w9WgXcQ', // Rick Astley - Never Gonna Give You Up
+        id: 'dQw4w9WgXcQ',
         title: 'The Surprising Power of Gratitude in Faith',
         channel: 'FaithFuel',
         views: '1.2M views',
@@ -69,8 +69,8 @@ const searchVideosFlow = ai.defineFlow(
         channelImageUrl: 'https://picsum.photos/seed/chan1/48/48',
       },
       {
-        id: 'L_LUpnjgPso', // Official "Charlie Bit My Finger"
-        title: 'Finding Peace in a Chaotic World: A Sermon',
+        id: 'L_LUpnjgPso',
+        title: 'Finding Peace in a Chaotic World: A Sermon on God\'s Love',
         channel: 'The Digital Pulpit',
         views: '890K views',
         uploadedAt: '1 month ago',
@@ -78,8 +78,8 @@ const searchVideosFlow = ai.defineFlow(
         channelImageUrl: 'https://picsum.photos/seed/chan2/48/48',
       },
       {
-        id: 'kfVsfOSbJY0', // Nyan Cat
-        title: 'Historical Context of the Book of Romans',
+        id: 'kfVsfOSbJY0',
+        title: 'Understanding Mercy: A Deep Dive into Scripture',
         channel: 'Bible Scholars United',
         views: '450K views',
         uploadedAt: '3 weeks ago',
@@ -87,8 +87,8 @@ const searchVideosFlow = ai.defineFlow(
         channelImageUrl: 'https://picsum.photos/seed/chan3/48/48',
       },
       {
-        id: 'jNQXAC9IVRw', // me at the zoo
-        title: 'Daily Devotional: Strength in Times of Trouble',
+        id: 'jNQXAC9IVRw',
+        title: 'Daily Devotional: Experiencing God\'s Care',
         channel: 'Morning Manna',
         views: '2.1M views',
         uploadedAt: '1 day ago',
@@ -96,8 +96,8 @@ const searchVideosFlow = ai.defineFlow(
         channelImageUrl: 'https://picsum.photos/seed/chan4/48/48',
       },
       {
-        id: 'ZZ5LpwO-An4', // Keyboard Cat
-        title: 'How to Read the Bible for Beginners',
+        id: 'ZZ5LpwO-An4',
+        title: 'How to Deepen Your Faith and Trust in God',
         channel: 'The Good Word',
         views: '3.5M views',
         uploadedAt: '6 months ago',
@@ -105,8 +105,8 @@ const searchVideosFlow = ai.defineFlow(
         channelImageUrl: 'https://picsum.photos/seed/chan5/48/48',
       },
       {
-        id: 'QH2-TGUlwu4', // Numa Numa
-        title: 'Parables of Jesus Explained: The Good Samaritan',
+        id: 'QH2-TGUlwu4',
+        title: 'The Infinite Love and Mercy of God',
         channel: 'Faith Visualized',
         views: '980K views',
         uploadedAt: '2 months ago',
@@ -114,8 +114,8 @@ const searchVideosFlow = ai.defineFlow(
         channelImageUrl: 'https://picsum.photos/seed/chan6/48/48',
       },
       {
-        id: 'Kxa_p_t5gGM',// Leave Britney Alone
-        title: 'Worship Session: Hymns of Praise',
+        id: 'Kxa_p_t5gGM',
+        title: 'Worship Session: Songs of Love and Grace',
         channel: 'Eternal Song',
         views: '750K views',
         uploadedAt: '3 days ago',
@@ -123,9 +123,9 @@ const searchVideosFlow = ai.defineFlow(
         channelImageUrl: 'https://picsum.photos/seed/chan7/48/48',
       },
       {
-        id: 'o-YBDTqX_ZU', // Chocolate Rain
-        title: 'The Life of David: A Shepherd King',
-        channel: 'Bible Stories Animated',
+        id: 'o-YBDTqX_ZU',
+        title: 'Sermon: He Cares for You - Trusting God in Hard Times',
+        channel: 'Johnchanglive',
         views: '4.2M views',
         uploadedAt: '1 year ago',
         thumbnailUrl: 'https://picsum.photos/seed/vid8/640/360',
