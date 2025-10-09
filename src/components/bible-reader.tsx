@@ -23,6 +23,32 @@ interface BibleReaderProps {
 
 const API_URL = 'https://bible-api.com';
 
+const RED_LETTER_BOOKS = ['Matthew', 'Mark', 'Luke', 'John', 'Acts', 'Revelation'];
+
+const RedLetterText = ({ text, isRedLetterBook }: { text: string; isRedLetterBook: boolean }) => {
+  if (!isRedLetterBook || !text.includes('"')) {
+    return <>{text}</>;
+  }
+
+  const parts = text.split(/(".*?")/g);
+
+  return (
+    <>
+      {parts.map((part, index) => {
+        if (part.startsWith('"') && part.endsWith('"')) {
+          return (
+            <span key={index} className="text-red-600 dark:text-red-400">
+              {part}
+            </span>
+          );
+        }
+        return <React.Fragment key={index}>{part}</React.Fragment>;
+      })}
+    </>
+  );
+};
+
+
 export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderProps) {
   const [selectedVersion, setSelectedVersion] = useState(Object.keys(BIBLE_VERSIONS)[0]);
   const [selectedBook, setSelectedBook] = useState(bibles[selectedVersion][0].book);
@@ -78,6 +104,8 @@ export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderP
     setSelectedChapter('1');
   };
 
+  const isRedLetterBook = RED_LETTER_BOOKS.includes(selectedBook);
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -132,7 +160,7 @@ export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderP
                         isBookmarked ? 'bg-accent/30' : 'group-hover:bg-muted'
                       )}
                     >
-                      {verse.text}
+                      <RedLetterText text={verse.text} isRedLetterBook={isRedLetterBook} />
                     </p>
                     <Button
                       size="icon"
