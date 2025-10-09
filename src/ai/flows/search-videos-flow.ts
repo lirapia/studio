@@ -144,7 +144,9 @@ const searchVideosFlow = ai.defineFlow(
 
     // Filter placeholder videos based on query for demonstration purposes
     const searchTerm = input.query.toLowerCase();
-    if (!searchTerm) return placeholderVideos.slice(0, 8);
+    if (!searchTerm) {
+        return placeholderVideos.slice(0, 8);
+    }
     
     return placeholderVideos.filter(v => 
         v.title.toLowerCase().includes(searchTerm) || 
