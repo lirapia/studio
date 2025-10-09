@@ -61,7 +61,7 @@ const searchVideosFlow = ai.defineFlow(
     // This mimics the structure of what the YouTube API would return.
     const placeholderVideos: Video[] = [
       {
-        id: 'dQw4w9WgXcQ',
+        id: 'placeholder1',
         title: 'The Surprising Power of Gratitude in Faith',
         channel: 'FaithFuel',
         views: '1.2M views',
@@ -71,7 +71,7 @@ const searchVideosFlow = ai.defineFlow(
         platform: 'youtube',
       },
       {
-        id: 'L_LUpnjgPso',
+        id: 'placeholder2',
         title: 'Finding Peace in a Chaotic World: A Sermon on God\'s Love',
         channel: 'The Digital Pulpit',
         views: '890K views',
@@ -81,7 +81,7 @@ const searchVideosFlow = ai.defineFlow(
         platform: 'youtube',
       },
       {
-        id: '197324351',
+        id: 'placeholder_vimeo_1',
         title: 'Understanding Mercy: A Deep Dive into Scripture',
         channel: 'Bible Scholars United',
         views: '450K views',
@@ -91,7 +91,7 @@ const searchVideosFlow = ai.defineFlow(
         platform: 'vimeo',
       },
       {
-        id: 'jNQXAC9IVRw',
+        id: 'placeholder4',
         title: 'Daily Devotional: Experiencing God\'s Care',
         channel: 'Morning Manna',
         views: '2.1M views',
@@ -101,7 +101,7 @@ const searchVideosFlow = ai.defineFlow(
         platform: 'youtube',
       },
       {
-        id: 'ZZ5LpwO-An4',
+        id: 'placeholder5',
         title: 'How to Deepen Your Faith and Trust in God',
         channel: 'The Good Word',
         views: '3.5M views',
@@ -111,7 +111,7 @@ const searchVideosFlow = ai.defineFlow(
         platform: 'youtube',
       },
       {
-        id: 'QH2-TGUlwu4',
+        id: 'placeholder6',
         title: 'The Infinite Love and Mercy of God',
         channel: 'Faith Visualized',
         views: '980K views',
@@ -121,7 +121,7 @@ const searchVideosFlow = ai.defineFlow(
         platform: 'youtube',
       },
       {
-        id: 'Kxa_p_t5gGM',
+        id: 'placeholder7',
         title: 'Worship Session: Songs of Love and Grace',
         channel: 'Eternal Song',
         views: '750K views',
@@ -131,7 +131,7 @@ const searchVideosFlow = ai.defineFlow(
         platform: 'youtube',
       },
       {
-        id: 'o-YBDTqX_ZU',
+        id: 'o-YBDTqX_ZU', // A real, relevant video
         title: 'Sermon: He Cares for You - Trusting God in Hard Times',
         channel: 'Johnnychanglive',
         views: '4.2M views',
