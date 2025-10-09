@@ -50,10 +50,10 @@ export default function HeroVerse({ customVerses, defaultVerseFetcher, onShowDef
       setVerse(customVerses[currentIndex]);
       interval = setInterval(() => {
         setCurrentIndex(prevIndex => (prevIndex + 1) % customVerses.length);
-      }, 60 * 60 * 1000); // every hour
+      }, 10000); // every 10 seconds for custom verses
     } else {
       fetchVerse();
-      interval = setInterval(fetchVerse, 60 * 60 * 1000); // every hour
+      interval = setInterval(fetchVerse, 60 * 60 * 1000); // every hour for default
     }
 
     return () => clearInterval(interval);
