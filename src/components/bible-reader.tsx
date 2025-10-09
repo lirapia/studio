@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Bookmark as BookmarkIcon } from 'lucide-react';
 import { bibles, BIBLE_VERSIONS } from '@/lib/bible';
-import type { Verse, Bookmark, Chapter, BibleBook } from '@/lib/types';
+import type { Verse, Bookmark } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -21,33 +21,7 @@ interface BibleReaderProps {
   bookmarks: Bookmark[];
 }
 
-const API_URL = 'https://bible-api.com';
-
-const RED_LETTER_BOOKS = ['Matthew', 'Mark', 'Luke', 'John', 'Acts', 'Revelation'];
-
-const RedLetterText = ({ text, isRedLetterBook }: { text: string; isRedLetterBook: boolean }) => {
-  if (!isRedLetterBook || !text.includes('"')) {
-    return <>{text}</>;
-  }
-
-  const parts = text.split(/(".*?")/g);
-
-  return (
-    <>
-      {parts.map((part, index) => {
-        if (part.startsWith('"') && part.endsWith('"')) {
-          return (
-            <span key={index} className="text-red-600 dark:text-red-400">
-              {part}
-            </span>
-          );
-        }
-        return <React.Fragment key={index}>{part}</React.Fragment>;
-      })}
-    </>
-  );
-};
-
+const API_URL = 'https://getbible.net/v2';
 
 export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderProps) {
   const [selectedVersion, setSelectedVersion] = useState(Object.keys(BIBLE_VERSIONS)[0]);
@@ -69,15 +43,27 @@ export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderP
     const fetchChapter = async () => {
       setLoading(true);
       try {
-        // The API expects lowercase translation, and might not support all versions listed.
-        // For example, it might default NKJV to KJV if it doesn't have it.
-        const translation = selectedVersion === 'NKJV' ? 'kjv' : selectedVersion.toLowerCase();
-        const response = await fetch(`${API_URL}/${selectedBook} ${selectedChapter}?translation=${translation}`);
+        const bibleId = selectedVersion === 'KJV' ? 'kjv' : 'nkjv';
+        const bookData = currentBible.find(b => b.book === selectedBook);
+        if (!bookData) throw new Error("Book not found");
+        
+        // Find book number
+        const bookNo = currentBible.indexOf(bookData) + 1;
+
+        const response = await fetch(`${API_URL}/${bibleId}/${bookNo}/${selectedChapter}.json`);
         if (!response.ok) {
           throw new Error('Failed to fetch chapter');
         }
-        const data = await response.json();
-        setVerses(data.verses);
+        const rawData = await response.json();
+
+        // The new API returns verses with HTML, so we need to process them.
+        const fetchedVerses = rawData.verses.map((v: any) => ({
+            verse: v.verse,
+            // We'll use dangerouslySetInnerHTML, so we store the HTML text
+            text: v.text
+        }));
+
+        setVerses(fetchedVerses);
       } catch (error) {
         console.error("Error fetching chapter:", error);
         setVerses([]);
@@ -87,7 +73,7 @@ export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderP
     };
 
     fetchChapter();
-  }, [selectedBook, selectedChapter, selectedVersion]);
+  }, [selectedBook, selectedChapter, selectedVersion, currentBible]);
 
 
   const bookmarkedVerseKeys = useMemo(() => 
@@ -107,7 +93,10 @@ export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderP
     setSelectedChapter('1');
   };
 
-  const isRedLetterBook = RED_LETTER_BOOKS.includes(selectedBook);
+  const stripHtml = (html: string) => {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.body.textContent || "";
+  }
 
   return (
     <Card className="w-full">
@@ -154,6 +143,12 @@ export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderP
               {verses.map(verse => {
                 const verseKey = `${selectedVersion}-${selectedBook}-${selectedChapter}-${verse.verse}`;
                 const isBookmarked = bookmarkedVerseKeys.has(verseKey);
+                
+                const verseForBookmark = { 
+                    ...verse, 
+                    text: stripHtml(verse.text) 
+                };
+
                 return (
                   <div key={verse.verse} className="group flex items-start gap-4">
                     <sup className="w-8 text-primary">{verse.verse}</sup>
@@ -162,14 +157,13 @@ export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderP
                         'flex-1 rounded-md p-2 transition-colors', 
                         isBookmarked ? 'bg-accent/30' : 'group-hover:bg-muted'
                       )}
-                    >
-                      <RedLetterText text={verse.text} isRedLetterBook={isRedLetterBook} />
-                    </p>
+                      dangerouslySetInnerHTML={{ __html: verse.text }}
+                    />
                     <Button
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"
-                      onClick={() => onBookmarkVerse(selectedVersion, selectedBook, parseInt(selectedChapter, 10), verse)}
+                      onClick={() => onBookmarkVerse(selectedVersion, selectedBook, parseInt(selectedChapter, 10), verseForBookmark)}
                       aria-label={`Bookmark verse ${verse.verse}`}
                       disabled={isBookmarked}
                     >
