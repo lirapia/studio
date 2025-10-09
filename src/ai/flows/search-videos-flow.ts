@@ -23,6 +23,7 @@ const VideoSchema = z.object({
     uploadedAt: z.string(),
     thumbnailUrl: z.string(),
     channelImageUrl: z.string(),
+    platform: z.enum(['youtube', 'vimeo']).optional(),
 });
 
 const SearchVideosOutputSchema = z.array(VideoSchema);
@@ -67,6 +68,7 @@ const searchVideosFlow = ai.defineFlow(
         uploadedAt: '2 weeks ago',
         thumbnailUrl: 'https://picsum.photos/seed/vid1/640/360',
         channelImageUrl: 'https://picsum.photos/seed/chan1/48/48',
+        platform: 'youtube',
       },
       {
         id: 'L_LUpnjgPso',
@@ -76,15 +78,17 @@ const searchVideosFlow = ai.defineFlow(
         uploadedAt: '1 month ago',
         thumbnailUrl: 'https://picsum.photos/seed/vid2/640/360',
         channelImageUrl: 'https://picsum.photos/seed/chan2/48/48',
+        platform: 'youtube',
       },
       {
-        id: 'kfVsfOSbJY0',
+        id: '197324351',
         title: 'Understanding Mercy: A Deep Dive into Scripture',
         channel: 'Bible Scholars United',
         views: '450K views',
         uploadedAt: '3 weeks ago',
         thumbnailUrl: 'https://picsum.photos/seed/vid3/640/360',
         channelImageUrl: 'https://picsum.photos/seed/chan3/48/48',
+        platform: 'vimeo',
       },
       {
         id: 'jNQXAC9IVRw',
@@ -94,6 +98,7 @@ const searchVideosFlow = ai.defineFlow(
         uploadedAt: '1 day ago',
         thumbnailUrl: 'https://picsum.photos/seed/vid4/640/360',
         channelImageUrl: 'https://picsum.photos/seed/chan4/48/48',
+        platform: 'youtube',
       },
       {
         id: 'ZZ5LpwO-An4',
@@ -103,6 +108,7 @@ const searchVideosFlow = ai.defineFlow(
         uploadedAt: '6 months ago',
         thumbnailUrl: 'https://picsum.photos/seed/vid5/640/360',
         channelImageUrl: 'https://picsum.photos/seed/chan5/48/48',
+        platform: 'youtube',
       },
       {
         id: 'QH2-TGUlwu4',
@@ -112,6 +118,7 @@ const searchVideosFlow = ai.defineFlow(
         uploadedAt: '2 months ago',
         thumbnailUrl: 'https://picsum.photos/seed/vid6/640/360',
         channelImageUrl: 'https://picsum.photos/seed/chan6/48/48',
+        platform: 'youtube',
       },
       {
         id: 'Kxa_p_t5gGM',
@@ -121,6 +128,7 @@ const searchVideosFlow = ai.defineFlow(
         uploadedAt: '3 days ago',
         thumbnailUrl: 'https://picsum.photos/seed/vid7/640/360',
         channelImageUrl: 'https://picsum.photos/seed/chan7/48/48',
+        platform: 'youtube',
       },
       {
         id: 'o-YBDTqX_ZU',
@@ -130,6 +138,7 @@ const searchVideosFlow = ai.defineFlow(
         uploadedAt: '1 year ago',
         thumbnailUrl: 'https://picsum.photos/seed/vid8/640/360',
         channelImageUrl: 'https://picsum.photos/seed/chan8/48/48',
+        platform: 'youtube',
       },
     ];
 

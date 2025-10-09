@@ -49,4 +49,5 @@ export type Video = {
   uploadedAt: string;
   thumbnailUrl: string;
   channelImageUrl: string;
+  platform?: 'youtube' | 'vimeo';
 };
