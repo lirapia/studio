@@ -2,8 +2,7 @@
 
 /**
  * @fileOverview This file defines a Genkit flow for searching YouTube videos.
- * It's set up to be easily integrated with the YouTube Data API.
- * For now, it returns placeholder data.
+ * It currently returns placeholder data.
  */
 
 import { ai } from '@/ai/genkit';
@@ -33,7 +32,6 @@ export type SearchVideosOutput = z.infer<typeof SearchVideosOutputSchema>;
 // This function is what your client-side code will call.
 export async function searchYoutubeVideos(input: SearchVideosInput): Promise<SearchVideosOutput> {
   // We are directly calling the flow here.
-  // In a production app, you might add more logic here, like caching.
   return searchVideosFlow(input);
 }
 
@@ -45,20 +43,9 @@ const searchVideosFlow = ai.defineFlow(
     outputSchema: SearchVideosOutputSchema,
   },
   async (input) => {
-    //
-    // TODO: Implement YouTube Data API call here.
-    //
-    // 1. You will need a YouTube Data API key.
-    // 2. You can use `node-fetch` or `axios` to make a request to the YouTube API.
-    //    Example endpoint: `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=8&q=${input.query}&type=video&key=YOUR_API_KEY`
-    // 3. You'll also need to fetch channel details to get the channel image.
-    // 4. Format the response to match the 'Video' type from '@/lib/types'.
-    //
-    
     console.log(`Searching for videos with query: ${input.query}`);
 
-    // Returning hardcoded placeholder data for now.
-    // This mimics the structure of what the YouTube API would return.
+    // Returning hardcoded placeholder data.
     const placeholderVideos: Video[] = [
       {
         id: 'placeholder1',
