@@ -69,7 +69,10 @@ export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderP
     const fetchChapter = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${API_URL}/${selectedBook} ${selectedChapter}?translation=${selectedVersion.toLowerCase()}`);
+        // The API expects lowercase translation, and might not support all versions listed.
+        // For example, it might default NKJV to KJV if it doesn't have it.
+        const translation = selectedVersion === 'NKJV' ? 'kjv' : selectedVersion.toLowerCase();
+        const response = await fetch(`${API_URL}/${selectedBook} ${selectedChapter}?translation=${translation}`);
         if (!response.ok) {
           throw new Error('Failed to fetch chapter');
         }
@@ -146,7 +149,7 @@ export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderP
               <Skeleton className="h-6 w-3/4" />
               <Skeleton className="h-6 w-5/6" />
             </div>
-          ) : (
+          ) : verses && verses.length > 0 ? (
             <div className="space-y-2 font-body text-lg leading-relaxed">
               {verses.map(verse => {
                 const verseKey = `${selectedVersion}-${selectedBook}-${selectedChapter}-${verse.verse}`;
@@ -175,6 +178,11 @@ export default function BibleReader({ onBookmarkVerse, bookmarks }: BibleReaderP
                   </div>
                 );
               })}
+            </div>
+          ) : (
+            <div className="text-center text-muted-foreground py-8">
+              <p>Could not load chapter content.</p>
+              <p className="text-sm">Please try selecting a different book, chapter, or version.</p>
             </div>
           )}
         </div>
