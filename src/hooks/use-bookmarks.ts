@@ -51,7 +51,11 @@ export function useBookmarks() {
       try {
         localStorage.setItem(BOOKMARKS_STORAGE_KEY, JSON.stringify(bookmarks));
         localStorage.setItem(GROUPS_STORAGE_KEY, JSON.stringify(groups));
-        localStorage.setItem(HERO_GROUP_ID_STORAGE_KEY, JSON.stringify(heroGroupId));
+        if (heroGroupId) {
+          localStorage.setItem(HERO_GROUP_ID_STORAGE_KEY, JSON.stringify(heroGroupId));
+        } else {
+          localStorage.removeItem(HERO_GROUP_ID_STORAGE_KEY);
+        }
       } catch (error) {
         console.error('Failed to save data to localStorage', error);
          toast({
@@ -133,7 +137,7 @@ export function useBookmarks() {
       } else {
          toast({
             title: "Hero Section Updated",
-            description: `Now showing AI-powered verses.`,
+            description: `Now showing default verses.`,
         });
       }
   },[groups, toast]);

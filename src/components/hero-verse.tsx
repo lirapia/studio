@@ -91,7 +91,7 @@ export default function HeroVerse({ customVerses, defaultVerseFetcher, onShowDef
                 </Button>
             </TooltipTrigger>
             <TooltipContent>
-                <p>Show AI-powered verses</p>
+                <p>Show default verses</p>
             </TooltipContent>
           </Tooltip>
       )}

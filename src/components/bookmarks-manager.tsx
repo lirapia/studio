@@ -88,23 +88,19 @@ export default function BookmarksManager({
         if (uncategorizedGroup) {
              groupMap.set(uncategorizedGroupId, []);
         }
-    } else {
-         const uncategorizedBookmarks = bookmarks.filter(b => b.groupId === null || b.groupId === uncategorizedGroupId);
-         groupMap.set(uncategorizedGroupId, uncategorizedBookmarks);
-    }
+    } 
+    
+    const uncategorizedBookmarks = bookmarks.filter(b => b.groupId === null || b.groupId === uncategorizedGroupId);
+    groupMap.set(uncategorizedGroupId, uncategorizedBookmarks);
+
 
     bookmarks.forEach(bookmark => {
       const groupId = bookmark.groupId ?? uncategorizedGroupId;
-      if (groupMap.has(groupId)) {
+      if (groupMap.has(groupId) && groupId !== uncategorizedGroupId) {
         const groupList = groupMap.get(groupId) || [];
         if (!groupList.find(b => b.id === bookmark.id)) {
             groupMap.set(groupId, [...groupList, bookmark]);
         }
-      } else {
-          // This case handles bookmarks with a groupId that no longer exists.
-          // They are added to uncategorized.
-          const currentUncategorized = groupMap.get(uncategorizedGroupId) || [];
-          groupMap.set(uncategorizedGroupId, [...currentUncategorized, bookmark]);
       }
     });
 
@@ -140,7 +136,7 @@ export default function BookmarksManager({
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent side="bottom">
-                            <p>Show AI-powered verses</p>
+                            <p>Show default verses</p>
                         </TooltipContent>
                     </Tooltip>
                 )}
@@ -181,7 +177,7 @@ export default function BookmarksManager({
                           {group.id === uncategorizedGroupId ? (
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button asChild variant="ghost" size="icon" className="h-8 w-8 ml-2 shrink-0" onClick={() => exportGroup(group.id)}>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 shrink-0" onClick={() => exportGroup(group.id)}>
                                       <Download className="h-4 w-4" />
                                     </Button>
                                 </TooltipTrigger>
@@ -192,7 +188,7 @@ export default function BookmarksManager({
                           ) : (
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button asChild variant="ghost" size="icon" className="h-8 w-8 ml-2 shrink-0" onClick={(e) => e.stopPropagation()}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 ml-2 shrink-0" onClick={(e) => e.stopPropagation()}>
                                   <MoreVertical className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
@@ -298,5 +294,3 @@ export default function BookmarksManager({
     </div>
   );
 }
-
-    
