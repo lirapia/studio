@@ -202,7 +202,9 @@ export function useBookmarks() {
       const group = groups.find(g => g.id === groupId);
       if(!group) return;
 
-      const groupBookmarks = bookmarks.filter(b => b.groupId === groupId);
+      const isUncategorized = groupId === UNCATEGORIZED_GROUP_ID;
+
+      const groupBookmarks = bookmarks.filter(b => isUncategorized ? (b.groupId === null || b.groupId === UNCATEGORIZED_GROUP_ID) : (b.groupId === groupId));
 
       if (groupBookmarks.length === 0) {
           toast({
@@ -213,14 +215,20 @@ export function useBookmarks() {
           return;
       }
 
-      const success = exportData({ bookmarks: groupBookmarks, groups: [group] }, `verse-mark-group-${group.title.toLowerCase().replace(/\s/g, '-')}.json`);
+      const exportObject = {
+        bookmarks: groupBookmarks,
+        groups: isUncategorized ? [group] : groups
+      }
+      
+      const success = exportData(exportObject, `verse-mark-group-${group.title.toLowerCase().replace(/\s/g, '-')}.json`);
+
       if(success) {
           toast({
               title: "Group Exported",
               description: `The group "${group.title}" has been exported.`,
           });
       }
-  }, [bookmarks, groups, toast, exportData]);
+  }, [bookmarks, groups, toast, exportData, UNCATEGORIZED_GROUP_ID]);
 
 
   const importBookmarks = useCallback((file: File) => {
@@ -232,12 +240,20 @@ export function useBookmarks() {
           throw new Error('File content is not a string');
         }
         const importedData = JSON.parse(text);
-        const importedBookmarks = importedData.bookmarks as Bookmark[] || [];
-        const importedGroups = importedData.groups as BookmarkGroup[] || [];
+        
+        let importedBookmarks: Bookmark[];
 
-        if (!Array.isArray(importedBookmarks) || (importedBookmarks.length > 0 && !importedBookmarks.every(b => b.book && b.chapter && b.verse))) {
+        // Handle both single bookmark and multi-bookmark/group export formats
+        if (Array.isArray(importedData.bookmarks)) {
+           importedBookmarks = importedData.bookmarks as Bookmark[] || [];
+        } else if (importedData.book && importedData.chapter && importedData.verse) {
+           importedBookmarks = [importedData as Bookmark];
+        } else {
             throw new Error("Invalid bookmark file format.");
         }
+       
+        const importedGroups = importedData.groups as BookmarkGroup[] || [];
+
         if (!Array.isArray(importedGroups)) {
             throw new Error("Invalid group data in file.");
         }
@@ -251,13 +267,15 @@ export function useBookmarks() {
         setBookmarks(prevBookmarks => {
           const existingKeys = new Set(prevBookmarks.map(b => `${b.book}-${b.chapter}-${b.verse}`));
           const newBookmarks = importedBookmarks.filter(b => !existingKeys.has(`${b.book}-${b.chapter}-${b.verse}`));
-          const bookmarksWithImportFlag = newBookmarks.map(b => ({ ...b, isImported: true, groupId: b.groupId || UNCATEGORIZED_GROUP_ID }));
+          const bookmarksWithImportFlag = newBookmarks.map(b => ({ ...b, isImported: true, id: b.id || crypto.randomUUID(), groupId: b.groupId || UNCATEGORIZED_GROUP_ID }));
           return [...bookmarksWithImportFlag, ...prevBookmarks];
         });
+
         toast({
             title: "Import Successful",
             description: `New bookmarks and groups have been added.`,
         });
+
       } catch (error) {
         console.error('Failed to import bookmarks', error);
         toast({

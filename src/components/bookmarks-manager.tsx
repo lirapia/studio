@@ -178,7 +178,18 @@ export default function BookmarksManager({
                                   <Badge variant="secondary" className="shrink-0">{groupBookmarks.length}</Badge>
                               </div>
                           </AccordionTrigger>
-                          {group.id !== uncategorizedGroupId && (
+                          {group.id === uncategorizedGroupId ? (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button asChild variant="ghost" size="icon" className="h-8 w-8 ml-2 shrink-0" onClick={() => exportGroup(group.id)}>
+                                      <Download className="h-4 w-4" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Export Uncategorized</p>
+                                </TooltipContent>
+                              </Tooltip>
+                          ) : (
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button asChild variant="ghost" size="icon" className="h-8 w-8 ml-2 shrink-0" onClick={(e) => e.stopPropagation()}>
