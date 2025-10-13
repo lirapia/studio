@@ -21,7 +21,6 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@6..72,400;6..72,700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
-        <script>{`(function(s){s.dataset.zone='10012952',s.src='https://forfrogadiertor.com/tag.min.js'})(document.head.appendChild(document.createElement('script')))`}</script>
       </head>
       <body className={cn('font-body')}>
         <ThemeProvider
@@ -32,7 +31,7 @@ export default function RootLayout({
           {children}
           <Toaster />
         </ThemeProvider>
-        <Script src="/ad.js" strategy="beforeInteractive" />
+        <Script src="/ad.js" strategy="afterInteractive" />
       </body>
     </html>
   );
