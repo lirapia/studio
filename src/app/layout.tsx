@@ -3,7 +3,6 @@ import './globals.css';
 import {ThemeProvider} from '@/components/theme-provider';
 import {Toaster} from '@/components/ui/toaster';
 import {cn} from '@/lib/utils';
-import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'VerseMark',
@@ -20,6 +19,7 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://www.googletagmanager.com/gtag/js?id=G-Q3W38382J2" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@6..72,400;6..72,700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
       </head>
       <body className={cn('font-body')}>
@@ -31,7 +31,6 @@ export default function RootLayout({
           {children}
           <Toaster />
         </ThemeProvider>
-        <Script src="/ad.js" strategy="afterInteractive" />
       </body>
     </html>
   );
