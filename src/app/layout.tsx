@@ -4,6 +4,7 @@ import {ThemeProvider} from '@/components/theme-provider';
 import {Toaster} from '@/components/ui/toaster';
 import {cn} from '@/lib/utils';
 import Script from 'next/script';
+import { ServiceWorkerRegistrar } from '@/components/service-worker-registrar';
 
 export const metadata: Metadata = {
   title: 'VerseMark',
@@ -42,6 +43,7 @@ export default function RootLayout({
           {children}
           <Toaster />
         </ThemeProvider>
+        <ServiceWorkerRegistrar />
       </body>
     </html>
   );
