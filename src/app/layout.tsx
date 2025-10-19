@@ -5,6 +5,7 @@ import {Toaster} from '@/components/ui/toaster';
 import {cn} from '@/lib/utils';
 import { ServiceWorkerRegistrar } from '@/components/service-worker-registrar';
 import { MonetagScripts } from '@/components/monetag-scripts';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'VerseMark',
@@ -19,6 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="antialiased">
       <head>
+        <Script id="monetag-script-2" dangerouslySetInnerHTML={{
+          __html: `(function(s){s.dataset.zone='9956044',s.src='https://forfrogadiertor.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`
+        }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://www.googletagmanager.com/gtag/js?id=G-Q3W38382J2" rel="stylesheet" />

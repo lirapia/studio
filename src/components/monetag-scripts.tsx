@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import Script from 'next/script';
 
 export function MonetagScripts() {
   useEffect(() => {
@@ -10,10 +9,6 @@ export function MonetagScripts() {
     script1.async = true;
     script1.dataset.cfasync = 'false';
     document.head.appendChild(script1);
-
-    const script2 = document.createElement('script');
-    script2.innerHTML = `(function(s){s.dataset.zone='9956044',s.src='https://forfrogadiertor.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`;
-    document.head.appendChild(script2);
 
     const script4 = document.createElement('script');
     script4.src = '//yohle.com/ntfc.php?p=10036763';
@@ -33,7 +28,6 @@ export function MonetagScripts() {
 
     return () => {
         document.head.removeChild(script1);
-        document.head.removeChild(script2);
         document.head.removeChild(script4);
     }
   }, []);
